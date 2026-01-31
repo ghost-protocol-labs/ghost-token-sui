@@ -1,6 +1,6 @@
 # **GHOST Token (Sui Move)**
 
-## **1️⃣ Overview**
+## **1️. Overview**
 
 **GHOST Token** is the native token of **Ghost Protocol**, a cross-chain DeFi platform with AI governance.
 
@@ -18,7 +18,7 @@
 
 ---
 
-## **2️⃣ Token Mechanics**
+## **2️. Token Mechanics**
 
 ### **Transfer Fee Logic**
 
@@ -59,7 +59,7 @@
 
 ---
 
-## **3️⃣ Contract Structure**
+## **3️. Contract Structure**
 
 **Move module:** `ghost::ghost_token`
 
@@ -81,7 +81,7 @@
 
 ---
 
-## **4️⃣ How it Works Step by Step**
+## **4️. How it Works Step by Step**
 
 1. **Deployment:**
 
@@ -107,7 +107,7 @@
 
 ---
 
-## **5️⃣ Example CLI Usage (TypeScript)**
+## **5️. Example CLI Usage (TypeScript)**
 
 ```bash
 # Transfer tokens
@@ -128,7 +128,7 @@ npm run add-exempt -- devnet 0x1234
 
 ---
 
-## **6️⃣ Security Notes**
+## **6️. Security Notes**
 
 * Use **multisig** for `AdminCap` in production
 * Protect treasury minimums to ensure quarterly burn can function
@@ -143,7 +143,7 @@ npm run add-exempt -- devnet 0x1234
 
 ---
 
-## **7️⃣ License**
+## **7️. License**
 
 MIT License – see LICENSE
 
