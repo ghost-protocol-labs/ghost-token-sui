@@ -1,208 +1,152 @@
-# Sui Contracts — Ghost Network
+# **GHOST Token (Sui Move)**
 
-This directory contains **all Sui Move smart contracts** for the Ghost Network ecosystem.
+## **1️⃣ Overview**
 
-It defines:
-- ✅ **Canonical GHOST token on Sui (mainnet)**
-- 🗳️ DAO governance & TreasuryCap custody
-- 🌉 Bridge vault logic (Sui ↔ Solana)
-- 🧪 **GHST test token** (devnet / testnet only)
+**GHOST Token** is the native token of **Ghost Protocol**, a cross-chain DeFi platform with AI governance.
 
-> **Important:**  
-> **GHOST** is the production token.  
-> **GHST** is strictly for testing and has no economic or governance relationship to GHOST.
+**Key Highlights:**
 
----
+* **Fixed Supply:** 20,000,000,000 GHOST
+* **Decimals:** 9
+* **Transfer Fee:** 2.5% (sender pays)
 
-## 📦 Directory Structure
-
-```
-
-contracts/sui/
-├── ghost/                    # ✅ MAINNET — Canonical GHOST
-│   ├── Move.toml
-│   └── sources/
-│       ├── ghost_token.move  # Immutable GHOST coin
-│       ├── dao.move          # DAO governance
-│       ├── treasury.move     # TreasuryCap custody
-│       ├── bridge_vault.move # Lock / unlock vault
-│       ├── bridge_events.move# Bridge event schema
-│       ├── pause.move        # Emergency pause
-│       └── errors.move       # Shared error codes
-│
-├── ghst-test/                # ⚠️ DEVNET / TESTNET ONLY
-│   ├── Move.toml
-│   └── sources/
-│       └── ghst_token.move   # Test token (GHST)
-│
-└── deploy/
-├── publish_mainnet.sh
-├── publish_testnet.sh
-├── verify_supply.sh
-└── lock_treasurycap.sh
-
-````
+  * **60% burned immediately**
+  * **40% goes to the treasury**
+* **Quarterly Burn:** Treasury can be burned permissionlessly if ≥ 3,000,000 GHOST, caller rewarded ~1%
+* **Admin Controls:** Pause/unpause transfers, withdraw treasury, force burn, manage fee exemptions
+* **Multi-network ready:** Devnet, Testnet, Mainnet
 
 ---
 
-## 🪙 Canonical Token — GHOST (Mainnet)
+## **2️⃣ Token Mechanics**
 
-**Package:** `contracts/sui/ghost`
+### **Transfer Fee Logic**
 
-### Token Parameters
-- **Name:** Ghost Network Token
-- **Symbol:** GHOST
-- **Decimals:** 9
-- **Total Supply:** **20,000,000,000 GHOST (fixed)**
-- **Standard:** Sui `coin` framework
-- **Mint Authority:** DAO-controlled `TreasuryCap`
+1. Every transfer charges **2.5%** by default.
+2. **60% of the fee** is burned (reduces total supply).
+3. **40% of the fee** goes to the **treasury balance**.
+4. **Exempt addresses** can skip the fee entirely.
 
-### Supply Guarantees
-- Entire supply is minted according to protocol rules
-- No inflation beyond 20B
-- No hidden mint paths
-- TreasuryCap is never publicly accessible
+**Example:**
 
----
+* Transfer 1,000 GHOST → Fee 25 GHOST
 
-## 🔒 Immutability & Upgrades
-
-### Immutable
-- `ghost_token.move`  
-  → **Never upgraded after v1.0.0**
-
-This guarantees:
-- Fixed supply
-- Stable coin type
-- Exchange & indexer safety
-
-### Upgradeable (DAO-Controlled)
-- `dao.move`
-- `treasury.move`
-- `bridge_*`
-- `pause.move`
-
-**Upgrade conditions**
-- DAO multisig approval
-- ≥ 2/3 quorum
-- Optional timelock (24–72h recommended)
-
-Public statement:
-> “The GHOST token contract is immutable. Governance and bridge modules may be upgraded via on-chain DAO governance.”
+  * Burn: 15 GHOST
+  * Treasury: 10 GHOST
+  * Recipient receives: 975 GHOST
 
 ---
 
-## 🧪 Test Token — GHST (Devnet / Testnet)
+### **Quarterly Burn**
 
-**Package:** `contracts/sui/ghst-test`
-
-### Purpose
-- Wallet integration testing
-- Frontend development
-- Bridge simulations
-
-### Hard Rules
-- ❌ Never deployed to mainnet
-- ❌ Never bridged
-- ❌ Never listed
-- ❌ Never shares state with GHOST
-
-This strict isolation is intentional and audit-enforced.
+* Any user or admin can trigger **`quarterly_burn`**.
+* Treasury balance must be ≥ **3,000,000 GHOST**.
+* Burns **entire treasury balance**.
+* Caller receives **~1% reward** from treasury.
+* Timestamp updated to track last burn.
 
 ---
 
-## 🗳️ DAO & Treasury
+### **Admin Functions**
 
-**Core responsibilities**
-- Custody of TreasuryCap
-- Controlled minting (if enabled)
-- Bridge configuration
-- Emergency pause / resume
-- Metadata version upgrades (if enabled)
-
-**Security model**
-- Multisig DAO
-- Explicit access checks
-- No single-key mint authority
+| Function            | Purpose                               |
+| ------------------- | ------------------------------------- |
+| `admin_force_burn`  | Force burn entire treasury anytime    |
+| `withdraw_treasury` | Withdraw specific GHOST from treasury |
+| `set_paused`        | Pause or unpause transfers            |
+| `add_exempt`        | Add address to fee-exempt list        |
+| `remove_exempt`     | Remove address from fee-exempt list   |
 
 ---
 
-## 🌉 Bridge (Sui Side)
+## **3️⃣ Contract Structure**
 
-**Modules**
-- `bridge_vault.move`
-- `bridge_events.move`
+**Move module:** `ghost::ghost_token`
 
-### Flow (Sui → Solana)
-1. User locks GHOST into Sui vault
-2. Event emitted with amount + nonce
-3. Relayer verifies event
-4. Wrapped GHOST minted on Solana
+**Key Structs:**
 
-### Reverse Flow
-- Burn wrapped GHOST on Solana
-- Proof submitted
-- GHOST unlocked on Sui
+* `GHOST` → Token type
+* `Treasury` → Holds treasury balance, paused state, last burn timestamp
+* `FeeConfig` → Holds transfer fee & burn split
+* `ExemptList` → Bag mapping addresses exempt from fees
+* `AdminCap` → Authority for admin functions
 
-### Protections
-- Replay protection (nonce)
-- Rate limits
-- DAO-controlled relayer set
-- Emergency pause
+**Key Entry Functions:**
+
+* `init` → Initializes contract, mints **20B GHOST** to deployer, sets up treasury and admin caps
+* `transfer` → Handles transfers with fees and optional burn/treasury split
+* `transfer_no_fee` → Free transfer for special cases
+* `quarterly_burn` → Burns treasury if ≥ 3M GHOST, rewards caller
+* Admin functions → Force burn, withdraw treasury, pause transfers, manage exemptions
 
 ---
 
-## 🧾 Metadata & Versioning
+## **4️⃣ How it Works Step by Step**
 
-- On-chain metadata is frozen at creation
-- Off-chain metadata follows **versioned JSON**
-- DAO may approve metadata version upgrades
-- No metadata change can affect supply or ownership
+1. **Deployment:**
+
+   * Deployer calls `init` → receives full supply of **20B GHOST**
+   * Treasury and admin caps are created
+   * FeeConfig & ExemptList initialized
+
+2. **User Transfers:**
+
+   * Calls `transfer`
+   * Fee calculated → Burn portion destroyed, Treasury portion added
+   * Exempt addresses bypass fees
+
+3. **Quarterly Burn:**
+
+   * Anyone can call `quarterly_burn`
+   * Treasury balance checked (≥ 3M GHOST)
+   * Treasury is burned, caller rewarded
+
+4. **Admin Operations:**
+
+   * Admin can withdraw from treasury, pause transfers, or force burn
 
 ---
 
-## 🚀 Build & Deployment
-
-### Build
-```bash
-cd contracts/sui/ghost
-sui move build
-````
-
-### Publish (Mainnet)
+## **5️⃣ Example CLI Usage (TypeScript)**
 
 ```bash
-./deploy/publish_mainnet.sh
-```
+# Transfer tokens
+npm run transfer -- devnet <coin_id> <recipient>
 
-### Verify Supply
+# Trigger quarterly burn
+npm run quarterly-burn -- devnet
 
-```bash
-./deploy/verify_supply.sh
+# Force burn treasury (admin)
+npm run force-burn -- devnet
+
+# Pause transfers
+npm run pause-transfers -- devnet true
+
+# Add exempt address
+npm run add-exempt -- devnet 0x1234
 ```
 
 ---
 
-## 🔍 Audit & Listing Notes
+## **6️⃣ Security Notes**
 
-* Canonical supply fixed at 20B
-* Clear separation: GHOST (prod) vs GHST (test)
-* Bridge minting strictly proof-based
-* Architecture compatible with:
-
-  * CoinMarketCap
-  * CoinGecko
-  * Major exchanges
+* Use **multisig** for `AdminCap` in production
+* Protect treasury minimums to ensure quarterly burn can function
+* Avoid sending treasury funds to untrusted addresses
 
 ---
 
-## 📜 License
-
-See root `LICENSE` file.
-
----
-
-## 👻 Ghost Network
+## Ghost Network
 
 * Website: [https://ghostnetwork.fun](https://ghostnetwork.fun)
 * GitHub: [https://github.com/ghost-protocol-labs](https://github.com/ghost-protocol-labs)
+
+---
+
+## **7️⃣ License**
+
+MIT License – see LICENSE
+
+Built on **Sui Move**.
+
+---
