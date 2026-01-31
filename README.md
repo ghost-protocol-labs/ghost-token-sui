@@ -126,7 +126,7 @@ npm run remove-exempt -- devnet 0x1234
 
 ## **Metadata & Resources**
 
-* Token icon: `ipfs://Qm.../ghost-logo-1000x1000.png`
+* Token icon: `ipfs://Qm.../ghost.png`
 * Metadata file: `metadata.json`
 * Dashboard: `[Your dashboard URL here]`
 * Telegram: `[Your Telegram link here]`
