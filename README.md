@@ -43,7 +43,7 @@ This repository contains the full **production-ready package** for the GHOST Tok
 
 ```
 
-ghost-token-fullstack/
+ghost-token-sui/
 ├── contracts/
 │   ├── ghost_token.move
 │   ├── Move.toml
