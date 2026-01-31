@@ -1,0 +1,40 @@
+name: Move Build & Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '25'
+
+    - name: Install dependencies
+      run: pnpm install
+
+    - name: Build TypeScript SDK
+      run: pnpm run build
+
+    - name: Install Sui CLI
+      run: |
+        curl -sSf https://apt.sui.io/install.sh | sh
+        export PATH="$HOME/.sui/bin:$PATH"
+
+    - name: Build Move Package
+      run: sui move build
+
+    - name: Run Move Tests
+      run: sui move test
+
+    - name: Lint TypeScript
+      run: pnpm run lint || true

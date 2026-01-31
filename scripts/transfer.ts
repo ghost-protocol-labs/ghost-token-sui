@@ -1,13 +1,16 @@
-import { SuiClient } from '@mysten/sui/client';
-import { TransactionBlock } from '@mysten/sui/transactions';
+#!/usr/bin/env ts-node
+import 'dotenv/config';
+import { transferTokens, printLink } from '../sdk';
 
-const client = new SuiClient({ url: 'https://fullnode.mainnet.sui.io' });
+async function main() {
+  const recipient = process.argv[2];
+  const amount = BigInt(process.argv[3]) * 1_000_000_000n;
 
-export async function transfer(coinId: string, recipient: string) {
-  const tx = new TransactionBlock();
-  tx.moveCall({
-    target: `${process.env.PACKAGE_ID}::ghost_token::transfer`,
-    arguments: [tx.object(coinId), tx.pure(recipient), tx.object(process.env.TREASURY_ID!), tx.object(process.env.EXEMPT_ID!)],
-  });
-  return client.signAndExecuteTransactionBlock({ transactionBlock: tx });
+  if (!recipient || !amount) throw new Error('Usage: npm run transfer -- <recipient> <amount>');
+
+  await transferTokens(recipient, amount);
+  console.log(`✅ Transferred ${amount} GHOST to ${recipient}`);
+  printLink('GHOST_TOKEN');
 }
+
+main();
