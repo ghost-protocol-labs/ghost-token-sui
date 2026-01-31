@@ -101,7 +101,7 @@ module ghost::ghost_token {
             b"Ghost Protocol Token",
             b"Native token of Ghost Protocol – Cross-chain DeFi with AI governance",
             option::some(url::new_unsafe_from_bytes(
-                b"ipfs://QmYourHashHere/ghost-logo-1000x1000.png"
+                b"ipfs://QmYourHashHere/ghost.png"
             )),
             ctx
         );
