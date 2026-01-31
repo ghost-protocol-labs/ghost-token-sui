@@ -1,8 +1,12 @@
-# Ghost Token Sui SDK
+<p align="center">
+  <img src="https://raw.githubusercontent.com/ghost-protocol-labs/ghost-token-sui/refs/heads/main/assets/GHOST.svg" width="100" alt="GHOST Token"/>
+</p>
 
-![GHOST](https://raw.githubusercontent.com/ghost-protocol-labs/ghost-token-sui/refs/heads/main/assets/GHOST.svg)
+<h1 align="center">Ghost Token Sui SDK</h1>
 
-**GHOST Token** is the native token of **Ghost Protocol**, a cross-chain DeFi platform with AI governance.
+<p align="center">
+  Native token of <strong>Ghost Protocol</strong> — cross-chain DeFi with AI governance
+</p>
 
 ---
 
