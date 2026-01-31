@@ -1,5 +1,7 @@
 # **GHOST Token (Sui Move)**
 
+/sources/
+
 ## **1️. Overview**
 
 **GHOST Token** is the native token of **Ghost Protocol**, a cross-chain DeFi platform with AI governance.
